@@ -1,15 +1,39 @@
-splitStats <- read.csv("Split.csv")
-seasonStats <- read.csv("Season.csv")
+
+
+splitStats <- read.csv("GoalieSplit.csv")
+seasonStats <- read.csv("GoalieSeason.csv")
 gameStats <- read.csv("GamebyGame.csv")
-subSplit <- subset(splitStats, iSF >= 22)
-subSplit <- subset(subSplit, iSF <= 24 )
-seasonSplit <- subset(seasonStats, GP >= 70)
+subSplit <- subset(splitStats, SA >= 150)
+subSplisubSplit <- subset(subSplit, SA <= 350)
+seasonSplit <- subset(seasonStats, GP >= 45)
 
-What <- merge(subSplit,seasonSplit, by = "Player")
+mergedData <- merge(subSplit,seasonSplit, by = "Player")
 # t <- merge(What, gameStats, by = "Player")
-cutDown2 <- subset(What, select=c("Player", "GP.x", "Goals.x", "GP.y", "Goals.y", "iSF.x"))
+cutDownData <- subset(mergedData, select=c("Player", "GA.x", "SA.x", "GA.y", "SA.y", "Sv..x", "Sv..y"))
 
+k <- nrow(cutDownData)
 
+p.bar <- 1 - mean(cutDownData$GA.x)/mean(cutDownData$SA.x)
+p.bar
+p.hat <- cutDownData$Sv..x/100
+p.hat
+
+ss.p.bar <- sum((p.hat - p.bar)^2)
+ss.p.bar
+
+sig.squared <- p.bar*(1 - p.bar)/234.2
+sig.squared
+
+c <- 1 - (k-3)*(p.bar*(1 - p.bar)/cutDownData$SA.x)/sum((p.hat - p.bar)^2)
+c
+cutDownData$JS <- p.bar + c*(p.hat - p.bar)
+RMSE <- function(x, y){sqrt(mean((x-y)^2))}
+cutDownData$SvP.x <- cutDownData$Sv..x/100
+cutDownData$SvP.y <- cutDownData$Sv..y/100
+
+RMSE(cutDownData$SvP.x, cutDownData$SvP.y)
+RMSE(cutDownData$JS, cutDownData$SvP.y)
+RMSE(p.bar, cutDownData$SvP.y)
 
 
 
