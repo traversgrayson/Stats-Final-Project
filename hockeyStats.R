@@ -5,7 +5,7 @@ seasonStats <- read.csv("GoalieSeason.csv")
 gameStats <- read.csv("GamebyGame.csv")
 subSplit <- subset(splitStats, SA >= 150)
 subSplisubSplit <- subset(subSplit, SA <= 350)
-seasonSplit <- subset(seasonStats, GP >= 45)
+seasonSplit <- subset(seasonStats, GP >= 40)
 
 mergedData <- merge(subSplit,seasonSplit, by = "Player")
 # t <- merge(What, gameStats, by = "Player")
@@ -21,7 +21,7 @@ p.hat
 ss.p.bar <- sum((p.hat - p.bar)^2)
 ss.p.bar
 
-sig.squared <- p.bar*(1 - p.bar)/234.2
+sig.squared <- p.bar*(1 - p.bar)/cutDownData$SA.x
 sig.squared
 
 c <- 1 - (k-3)*(p.bar*(1 - p.bar)/cutDownData$SA.x)/sum((p.hat - p.bar)^2)
@@ -31,11 +31,15 @@ RMSE <- function(x, y){sqrt(mean((x-y)^2))}
 cutDownData$SvP.x <- cutDownData$Sv..x/100
 cutDownData$SvP.y <- cutDownData$Sv..y/100
 
+cutDownData$SMMS <- mapply(RMSE,cutDownData$SvP.x, cutDownData$SvP.y)
+cutDownData$JSMS <- mapply(RMSE,cutDownData$JS, cutDownData$SvP.y)
 RMSE(cutDownData$SvP.x, cutDownData$SvP.y)
 RMSE(cutDownData$JS, cutDownData$SvP.y)
 RMSE(p.bar, cutDownData$SvP.y)
 
-
+counts <- table(cutDownData$JSMS, cutDownData$SMMS)
+counts <- counts[!is.na[counts]]
+barplot(cutDownData$JS, beside = TRUE,space = 1, names.arg = cutDownData$Player)
 
 
 
