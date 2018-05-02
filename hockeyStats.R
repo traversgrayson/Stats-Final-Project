@@ -5,7 +5,7 @@ seasonStats <- read.csv("GoalieSeason.csv")
 gameStats <- read.csv("GamebyGame.csv")
 subSplit <- subset(splitStats, SA >= 150)
 subSplisubSplit <- subset(subSplit, SA <= 350)
-seasonSplit <- subset(seasonStats, GP >= 40)
+seasonSplit <- subset(seasonStats, GP >= 50)
 
 mergedData <- merge(subSplit,seasonSplit, by = "Player")
 # t <- merge(What, gameStats, by = "Player")
