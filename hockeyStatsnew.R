@@ -47,7 +47,7 @@ k <- nrow(cutDownData) # number of unknown means
 p.bar <- 1 - mean(cutDownData$GA.x)/mean(cutDownData$SA.x) #total average of averages
 p.hat <- cutDownData$SvP.x # Sample means, the MLEs
 c <- 1 - (k-3)*(p.bar*(1 - p.bar)/cutDownData$SA.x)/sum((p.hat - p.bar)^2) # apply the shrinkage formula
-# c
+c
 
 # Calculate our MSE values for JS Estimator and the MLE (SvP.x)
 meanSq <- function(x, y){sqrt(mean((x-y)^2))}
@@ -79,8 +79,16 @@ ggplot(cutDown.long,aes(Player,value,fill=variable))+
 ### ----------------------------------------------------- ###
 
 cutDownSP <- subset(cutDownData, select=c("Player", "JS", "SvP.x", "SvP.y"))
-SPplot <- cutDownSP > gather(key, value, -Player)
-ggplot(SPplot, mapping = aes(x = Player, y = value, color = key)) + geom_line()
+cutDownSP$Player <- sub(".*? (.+)", "\\1", cutDownSP$Player)
+cutDownSP.long<-melt(cutDownSP)
+ggplot(cutDownSP.long,aes(Player,value,fill=variable))+
+  geom_bar(stat="identity",position="dodge") +
+  theme(axis.text.x=element_text(angle = -55, hjust = 0)) +
+  coord_cartesian(ylim = c(.85, 1))
+  #coord_flip() 
+
+#SPplot <- cutDownSP > gather(key, value, -Player)
+#ggplot(SPplot, mapping = aes(x = Player, y = value, color = key)) + geom_line()
 
 # Grouped
 #ggplot(cutDownData,aes(x=Player)) + 
