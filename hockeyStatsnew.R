@@ -34,29 +34,32 @@ gameStats <- read.csv("GamebyGame.csv")
 # and played at least 50 games in the season
 subSplit <- subset(splitStats, SA >= 150)
 subSplit <- subset(subSplit, SA <= 350)
-seasonSplit <- subset(seasonStats, GP >= 40)
+seasonSplit <- subset(seasonStats, GP >= 50)
 
 # Merge the split and season data and remove unnecessary columns
 mergedData <- merge(subSplit,seasonSplit, by = "Player")
 cutDownData <- subset(mergedData, select=c("Player", "GA.x", "SA.x", "GA.y", "SA.y", "Sv..x", "Sv..y"))
 cutDownData$SvP.x <- cutDownData$Sv..x/100
 cutDownData$SvP.y <- cutDownData$Sv..y/100
+sum(cutDownData$SA.x)
 
 # Caulculate the shrinkage c for the JS Estimator
 k <- nrow(cutDownData) # number of unknown means
-p.bar <- 1 - mean(cutDownData$GA.x)/mean(cutDownData$SA.x) #total average of averages
-p.hat <- cutDownData$SvP.x # Sample means, the MLEs
-c <- 1 - (k-3)*(p.bar*(1 - p.bar)/cutDownData$SA.x)/sum((p.hat - p.bar)^2) # apply the shrinkage formula
-c
-
+pbar <- 1 - mean(cutDownData$GA.x)/mean(cutDownData$SA.x) #total average of averages
+pbar
+phat <- cutDownData$SvP.x # Sample means, the MLEs
+c <- 1 - (k-3)*(phat*(1 - phat)/cutDownData$SA.x)/sum((phat - pbar)^2) # apply the shrinkage formula
+cAdjust <- mapply(min, c, 1)
+cAdjust <- mapply(max,c, 0)
+cAdjust
 # Calculate our MSE values for JS Estimator and the MLE (SvP.x)
 meanSq <- function(x, y){sqrt(mean((x-y)^2))}
-cutDownData$JS <- p.bar + c*(p.hat - p.bar) # create a column for JS estimates
+cutDownData$JS <- p.bar + cAdjust*(phat - pbar) # create a column for JS estimates
 cutDownData$SMMS <- mapply(meanSq,cutDownData$SvP.x, cutDownData$SvP.y)
 cutDownData$JSMS <- mapply(meanSq,cutDownData$JS, cutDownData$SvP.y)
-meanSq(cutDownData$SvP.x, cutDownData$SvP.y) ## total MLE MSE
-meanSq(cutDownData$JS, cutDownData$SvP.y) ## total JS MSE
-meanSq(p.bar, cutDownData$SvP.y)
+meanSq(cutDownData$SvP.x, cutDownData$SvP.y) ## total MLE MSE 
+meanSq(cutDownData$JS, cutDownData$SvP.y)
+meanSq(pbar, cutDownData$SvP.y) ## total JS MSE
 
 ### ----------------------------------- ###
 
@@ -76,15 +79,23 @@ ggplot(cutDown.long,aes(Player,value,fill=variable))+
   theme(axis.text.x=element_text(angle = -55, hjust = 0)) +
  scale_fill_manual(values=c("#E69F00", "#56B4E9"))
 
+
 ### ----------------------------------------------------- ###
 
-cutDownSP <- subset(cutDownData, select=c("Player", "JS", "SvP.x", "SvP.y"))
+cutDownSP <- subset(cutDownData, select=c("Player", "SvP.x", "JS", "SvP.y"))
 cutDownSP$Player <- sub(".*? (.+)", "\\1", cutDownSP$Player)
+cutDownSP <- cutDownSP[sample(nrow(cutDownSP),10),]
 cutDownSP.long<-melt(cutDownSP)
-ggplot(cutDownSP.long,aes(Player,value,fill=variable))+
-  geom_bar(stat="identity",position="dodge") +
-  theme(axis.text.x=element_text(angle = -55, hjust = 0)) +
-  coord_cartesian(ylim = c(.85, 1))
+SPmelt <- melt(cutDownSP, id="Player")
+attach(SPmelt)
+new <- SPmelt[order(SPmelt$Player),]
+detach(SPmelt)
+
+ggplot(data=new, aes(x=variable, y=value)) + geom_line(aes(group=Player, color=Player), linetype="solid") + geom_point(aes(color=Player))
+#ggplot(cutDownSP.long,aes(Player,value,fill=variable))+
+ # geom_bar(stat="identity",position="dodge") +
+  #theme(axis.text.x=element_text(angle = -55, hjust = 0)) +
+  c#oord_cartesian(ylim = c(.85, 1))
   #coord_flip() 
 
 #SPplot <- cutDownSP > gather(key, value, -Player)
