@@ -8,8 +8,10 @@
 ### for a lecture on Stein's Paradox.
 ### URL: https://statsbylopez.files.wordpress.com/2016/01/lecture_8.pdf
 
+### ------------------------------------------
 ### Goal: To use James-Stein Estimators to provide a better estimation of 
 ### end-of-season save percentages than the MLE
+### -------------------------------------------
 
 # install.packages("xtable")
 # install.packages("dplyr")
