@@ -8,8 +8,10 @@
 ### for a lecture on Stein's Paradox.
 ### URL: https://statsbylopez.files.wordpress.com/2016/01/lecture_8.pdf
 
+### ------------------------------------------
 ### Goal: To use James-Stein Estimators to provide a better estimation of 
 ### end-of-season save percentages than the MLE
+### -------------------------------------------
 
 install.packages("xtable")
 install.packages("dplyr")
@@ -30,7 +32,6 @@ library(reshape2)
 
 splitStats <- read.csv("GoalieSplit.csv")
 seasonStats <- read.csv("GoalieSeason.csv")
-gameStats <- read.csv("GamebyGame.csv") 
 
 # Keep only the players who have between 150-350 shots against in the first split, 
 # and played at least 50 games in the season
@@ -60,8 +61,7 @@ cutDownData$JS <- pbar + c*(phat - pbar) # create a column for JS estimates
 cutDownData$SMMS <- mapply(meanSq,cutDownData$SvP.x, cutDownData$SvP.y)
 cutDownData$JSMS <- mapply(meanSq,cutDownData$JS, cutDownData$SvP.y)
 meanSq(cutDownData$SvP.x, cutDownData$SvP.y) ## total MLE MSE 
-meanSq(cutDownData$JS, cutDownData$SvP.y)
-meanSq(pbar, cutDownData$SvP.y) ## total JS MSE
+meanSq(cutDownData$JS, cutDownData$SvP.y)## total JS MSE
 
 mean(cutDownData$JSMS)
 mean(cutDownData$SMMS)
