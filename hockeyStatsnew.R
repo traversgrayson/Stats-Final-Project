@@ -11,11 +11,11 @@
 ### Goal: To use James-Stein Estimators to provide a better estimation of 
 ### end-of-season save percentages than the MLE
 
-# install.packages("xtable")
-# install.packages("dplyr")
-# install.packages("tidyr")
-# install.packages("ggplot2")
-# install.packages("reshape2")
+install.packages("xtable")
+install.packages("dplyr")
+install.packages("tidyr")
+install.packages("ggplot2")
+install.packages("reshape2")
 
 library(dplyr)
 library(tidyr)
